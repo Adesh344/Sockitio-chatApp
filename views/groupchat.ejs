@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Group Chat</title>
+  <link rel="stylesheet" href="/group.css">
+</head>
+
+<body>
+  <h1>Group Chat - <%= groupName %>
+  </h1>
+  <div id="chat-box">
+
+  </div>
+  <input type="text" id="message-input" placeholder="Type your message...">
+  <button id="send-button">Send</button>
+  <form id="fileForm" enctype="multipart/form-data">
+    <input type="file" name="file" id="fileInput" />
+    <button type="button" onclick="uploadFile()">Upload</button>
+  </form>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.2/socket.io.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+  <script>
+    var socket;
+
+    $(function () {
+      socket = io();
+      var chatBox = $('#chat-box');
+      var messageInput = $('#message-input');
+      var sendButton = $('#send-button');
+      var fileInput = $('#fileInput');
+      var fileForm = $('#fileForm');
+
+      var userName = '<%= user.name %>' || 'Guest';
+      var gname = '<%= groupName %>';
+      socket.emit('joinGroup', '<%= groupName %>', '<%= user.name %>');
+
+      // Listen for incoming group messages
+      socket.on('groupMessage', function (data) {
+        var alignmentClass = data.sender === userName ? 'align-right' : 'align-left';
+        var messageHTML = '<p class="' + alignmentClass + '"><strong>' + data.sender + ':</strong> ' + data.message + '</p>';
+        chatBox.append(messageHTML);
+      });
+
+      socket.on('fileUploaded', function (data) {
+        var alignmentClass = data.sender === userName ? 'align-right' : 'align-left';
+        var messageHTML = `<p class="${alignmentClass} chat-image"><strong>${data.sender}:</strong> <img src="${data.filePath}" ></p>`;
+        chatBox.append(messageHTML);
+      });
+
+      socket.emit('setUserName', userName);
+
+      sendButton.click(function () {
+        var message = messageInput.val();
+        socket.emit('sendGroupMessage', { sender: userName, message: message, type: 'text', groupName: gname });
+        messageInput.val('');
+      });
+
+
+      socket.on('previousMessages', function (messages) {
+        messages.forEach((message) => {
+          var alignmentClass = message.sender === userName ? 'align-right' : 'align-left';
+
+          if (message.type === 'text') {
+            // Handle text messages
+            var messageHTML = `<p class="${alignmentClass}"><strong>${message.sender}:</strong> ${message.message}</p>`;
+            chatBox.append(messageHTML);
+          } else if (message.type === 'image') {
+            // Handle image messages
+            var messageHTML = `<p class="${alignmentClass} chat-image"><strong>${message.sender}:</strong> <img src="${message.message}" ></p>`;
+            chatBox.append(messageHTML);
+          }
+        });
+      });
+
+
+      fileForm.submit(function (e) {
+        e.preventDefault();
+        uploadFile();
+      });
+
+    });
+
+    function uploadFile() {
+      var userName = '<%= user.name %>';
+      var gname = '<%= groupName %>';
+      var fileInput = document.getElementById('fileInput');
+      var file = fileInput.files[0];
+      var formData = new FormData();
+      formData.append('file', file);
+
+      fetch('/upload', {
+        method: 'POST',
+        body: formData,
+      }).then(response => response.json())
+        .then(data => {
+          console.log('File uploaded successfully. File path:', data.filePath);
+          socket.emit('sendGroupFile', { sender: '<%= user.name %>', filePath: data.filePath, message: data.filePath, type: 'image', groupName: gname });
+        })
+        .catch(error => {
+          console.error('Error uploading file:', error);
+        });
+    }
+  </script>
+</body>
+
+</html>

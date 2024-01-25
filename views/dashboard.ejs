@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard</title>
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>WassApp, <%= user.name %></h1>
+  <h2>Join Group</h2>
+  <form id="joinGroupForm">
+    <input type="text" id="groupNameInput" placeholder="Enter Group Name" required>
+    <button type="submit">Join Group</button>
+  </form>
+  <!-- <button id="showCreateGroupForm">Create Group</button>
+  <form id="joinGroupForm" style="display: none;">
+    <input type="text" id="groupNameInput" placeholder="Enter Group Name" required>
+     <select class="form-select" id="multiple-select-field" data-placeholder="Choose anything" multiple>
+      <% users.forEach(u => { %>
+        <% if (u.name !== user.name) { %>
+          <option value="<%= u._id %>"><%= u.name %></option>
+        <% } %>
+      <% }); %>
+    </select>
+    <div id="usersCheckboxList">
+      <% users.forEach(u => { %>
+        <% if (u.name !== user.name) { %>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" value="<%= u._id %>" id="<%= 'userCheckbox_' + u._id %>">
+            <label class="form-check-label" for="<%= 'userCheckbox_' + u.name %>">
+              <%= u.name %>
+            </label>
+          </div>
+        <% } %>
+      <% }); %>
+    </div>
+    <button type="submit">Join Group</button>
+  </form> -->
+  
+  <h2>Users:</h2>
+  <ul>
+    <% users.forEach(u => { %>
+      <% if (u.name !== user.name) { %>
+        <li><a href="/chat/privatechat/<%= u.name %>"><%= u.name %></a></li>
+      <% } %>
+    <% }); %>
+  </ul>
+  <a href="/logout">Logout</a>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.2/socket.io.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+  <script>
+
+
+   $(function () {
+    var socket = io();
+
+    $('a').click(function(event) {
+      event.preventDefault();
+      var href = $(this).attr('href');
+      window.location.href = href;
+    });
+
+    $('#joinGroupForm').submit(function () {
+      var groupName = $('#groupNameInput').val();
+      // var selectedMembers = [];
+      // $('input[type="checkbox"]:checked').each(function() {
+      //   selectedMembers.push($(this).val());
+      //   console.log("selected member:",selectedMembers);
+      // });
+
+      // $.post('/chat/createGroup',{groupName:groupName, members: selectedMembers},function(data){
+      //   console.log("Group created",data);
+        
+        window.location.href = '/chat/groupchat/' + encodeURIComponent(groupName);
+       // window.location.href = '/chat/groupchat/' + encodeURIComponent(data.groupId);
+     // })
+
+      return false;
+    });
+  });
+
+  $(document).ready(function() {
+    $('#showCreateGroupForm').click(function() {
+      $('#joinGroupForm').toggle(); // Toggle the visibility of the form
+    });
+
+    $('#joinGroupForm').submit(function(e) {
+      e.preventDefault();
+      // Handle form submission here, e.g., send data to the server
+      // and create the group
+      console.log('Form submitted');
+    });
+  });
+
+
+</script>
+  
+</body>
+</html>
+

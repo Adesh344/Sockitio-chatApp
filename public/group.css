@@ -1,0 +1,83 @@
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+  }
+  
+  h1 {
+    background-color: #075e54;
+    color: #ffffff;
+    padding: 15px;
+    margin: 0;
+  }
+  
+  #chat-box {
+    max-height: 800px;
+    overflow-y: scroll;
+    padding: 10px;
+  }
+  
+  #chat-box p {
+    margin: 5px 0;
+  }
+  
+  #message-input {
+    width: calc(100% - 70px);
+    padding: 10px;
+    margin: 10px 0;
+  }
+  
+  #send-button {
+    width: 60px;
+    padding: 10px;
+    margin: 10px 0;
+    background-color: #075e54;
+    color: #ffffff;
+    border: none;
+    cursor: pointer;
+  }
+  
+  #send-button:hover {
+    background-color: #128c7e;
+  }
+  
+  .align-left {
+    text-align: left;
+    margin-left: 30px;
+    background-color: #ddd;
+    padding: 10px;
+    border-radius: 5px;
+    max-width: 70%;
+}
+
+.align-right {
+    text-align: right;
+    margin-right: 30px;
+    background-color: #4CAF50;
+    color: #fff;
+    padding: 10px;
+    border-radius: 5px;
+    max-width: 70%;
+}
+
+
+#choose-file {
+  width: 120px;
+  padding: 10px;
+  margin: 10px 0;
+  background-color: #075e54;
+  color: #ffffff;
+  border: none;
+  cursor: pointer;
+}
+
+#choose-file:hover {
+  background-color: #128c7e;
+}
+
+.chat-image {
+  max-width: 100%;
+  height: auto;
+}
+  /* You can add more styles as needed */
+  

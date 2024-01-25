@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/style1.css">
+  <title>Private Chat</title>
+</head>
+<body>
+  <!-- <h1>Private Chat</h1>
+  <h2>From: <%= user.name %></h2>
+  <h2>To: <%= recipient %></h2>
+  <ul id="messages"></ul>
+  <form id="form" action="">
+    <input id="m" autocomplete="off" /><button>Send</button>
+  </form>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.2/socket.io.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+  <script>
+  $(function () {
+    var socket = io();
+
+    $('form').submit(function() {
+      socket.emit('private message', { from: '<%= user.name %>', to: '<%= recipient %>', message: $('#m').val() });
+      $('#m').val('');
+      return false;
+    });
+
+    socket.on('private message', function(msg){
+      $('#messages').append($('<li>').text(msg.from + ': ' + msg.message));
+    });
+  });
+</script>
+</body>
+</html> -->
+<!-- <h1>Private Chat</h1>
+<h2>From: <span id="fromUser"><%= user.name %></span></h2>
+<h2>To: <span id="toUser"><%= recipient %></span></h2>
+<ul id="messages"></ul>
+<form id="form" action="">
+  <input id="m" autocomplete="off" /><button>Send</button>
+</form> -->
+
+<div id="messages-container">
+    <h2 class="uname"></h2>
+    <ul id="messages"></ul>
+    <form id="form" action="">
+      <input type="hidden" id="selectedUser" name="selectedUser" value="">
+      <input id="m" autocomplete="off" placeholder="Type your message..." />
+      <button type="submit">Send</button>
+    </form>
+  </div>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.2/socket.io.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script>
+// $(function () {
+//   var socket = io();
+//   var fromUser = '<%= user.name %>';
+//   var toUser = '<%= recipient %>';
+
+//   $('#form').submit(function() {
+//     socket.emit('private message', { from: fromUser, to: toUser, message: $('#m').val() });
+//     $('#m').val('');
+//     return false;
+//   });
+
+//   socket.on('private message', function(msg){
+//     //$('#messages').append($('<li>').text(msg.from + ': ' + msg.message));
+//     $('#messages').append($('<li>').text(msg.message));
+//   });
+// });
+
+$(function () {
+  var socket = io('/private-chat');
+  var fromUser = '<%= user.name %>';
+  var toUser = '<%= recipient %>';
+
+  $('#form').submit(function(e) {
+    e.preventDefault();
+    socket.emit('private message', { from: fromUser, to: toUser, message: $('#m').val() });
+    $('#m').val('');
+    return false;
+  });
+
+  socket.on('private message', function(msg){
+    var sender = msg.from === fromUser ? 'You' : msg.from;
+   // $('#messages').append($('<li>').text(sender + ': ' + msg.message));
+   //$('#messages').append($('<li>').text(msg.message));
+    $('#messages').append($('<li>').text(`${sender}: ${msg.message}`));
+  });
+});
+
+
+</script>
+</body>
+</html>

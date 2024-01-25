@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Private Chat</title>
+  <link rel="stylesheet" href="/private.css">
+</head>
+<body>
+  <div class="chat-container">
+  <h1><%= recipient%> </h1>
+  <div id="chat-box"></div>
+  <input type="text" id="message-input" placeholder="Type your message...">
+  <button id="send-button">Send</button>
+  <form id="fileForm" enctype="multipart/form-data">
+    <input type="file" name="file" id="fileInput" />
+    <button type="button" onclick="uploadFile()">Upload</button>
+  </form>
+</div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.2/socket.io.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+  <script>
+     var socket;
+     $(function () {
+      socket = io();
+      var chatBox = $('#chat-box');
+      var messageInput = $('#message-input');
+      var sendButton = $('#send-button');
+      var fileInput = $('#fileInput');
+      var fileForm = $('#fileForm');
+     var chatUser = '<%= recipient %>';
+
+      // Emit the user you want to chat with to the server
+      socket.emit('privateChat', { user: '<%= user.name %>', chatUser: chatUser });
+
+      // Listen for incoming messages
+      socket.on('privateMessage', function (data) {
+        var alignmentClass = data.sender === '<%= user.name %>' ? 'align-right' : 'align-left';
+        var messageHTML = '<p class="' + alignmentClass + '"><strong>' + data.sender + ':</strong> ' + data.message + '</p>';
+       chatBox.append(messageHTML);
+      });
+
+      socket.on('privatefileUploaded', function (data) {
+        var alignmentClass = data.sender === '<%= user.name %>' ? 'align-right' : 'align-left';
+        var messageHTML = `<p class="${alignmentClass} chat-image"><strong>${data.sender}:</strong> <img src="${data.filePath}" ></p>`;
+        chatBox.append(messageHTML);
+      });
+      
+      // Send a private message
+      sendButton.click(function () {
+        var message = messageInput.val();
+        socket.emit('sendPrivateMessage', { sender: '<%= user.name %>', receiver: chatUser, message: message });
+        messageInput.val('');
+      });
+
+      fileForm.submit(function (e) {
+        e.preventDefault();
+        uploadFile();
+      });
+    });
+
+    function uploadFile() {
+      var userName = '<%= user.name %>';
+      var fileInput = document.getElementById('fileInput');
+      var file = fileInput.files[0];
+      var formData = new FormData();
+      formData.append('file', file);
+
+      fetch('/upload', {
+        method: 'POST',
+        body: formData,
+      }).then(response => response.json())
+        .then(data => {
+          console.log('File uploaded successfully. File path:', data.filePath);
+          console.log(userName);
+          socket.emit('sendprivateFile', { sender: userName, filePath: data.filePath, message: data.filePath, type: 'image'});
+        })
+        .catch(error => {
+          console.error('Error uploading file:', error);
+        });
+      }
+
+
+  </script>
+</body>
+</html> 
