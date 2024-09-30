@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-mongoose.connect("mongodb+srv://adesh:12345@cluster0.2oki501.mongodb.net/Chatapp")
+mongoose.connect("Add Your Key here")
 .then(()=>{
     console.log("Mongodb connected");
 })
